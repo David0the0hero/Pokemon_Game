@@ -1,44 +1,44 @@
-
 import random
 
 
 
 class pokemon:
-    def __init__(self,hp,a1_name,a1_dam,a2_name,a2_dam,a3_name,a3_dam,type,weakness):
+    def __init__(self,hp,a1_name,a1_dam,a2_name,a2_dam,a3_name,a3_dam,type,weakness,trainer=None):
         self.hp = hp
         self.attack = {a1_name:a1_dam,a2_name:a2_dam,a3_name:a3_dam}
         self.type = type
         self.weakness = weakness
+        self.trainer = trainer
        
-Pikachu = pokemon(90,"quick attack",40,"iron tail",100,"thunderbolt",100,"electric",["ground"])
+Pikachu = pokemon(90,"quick attack",40,"iron tail",100,"thunderbolt",100,"electric",["ground"],"Ash")
 
 
 
-Springatito = pokemon(90,"scratch", 10,"leafage",20,"trailblaze",50,"grass",["fire","ice","flying","poison","bug"])
+Springatito = pokemon(90,"scratch", 10,"leafage",20,"trailblaze",50,"grass",["fire","ice","flying","poison","bug"],"Goh")
 
 
 
-Glaceon = pokemon(110,"freeze-dry",70 ,"ice-fang",65,"quick-attack",40,"water",["fire","fighting","rock","steel"])
+Glaceon = pokemon(110,"freeze-dry",70 ,"ice-fang",65,"quick-attack",40,"water",["fire","fighting","rock","steel"],"Rea")
 
 
 
-Eevee = pokemon(90,"tackle",60,"covet",40,"bite",60,"normal",["fighting"])
+Eevee = pokemon(90,"tackle",60,"covet",40,"bite",60,"normal",["fighting"],"Chloe")
 
 
 
-Charmander= pokemon(90,"fire-spin",40,"false-swipe",40,"ember",40,"fire",["water","ground","rock"])
+Charmander= pokemon(90,"fire-spin",40,"false-swipe",40,"ember",40,"fire",["water","ground","rock"],"Leon")
 
 
 
-Charmeleon= pokemon(100,"slash",70,"flamethrower",90,"firefang",65,"fire",["water","ground","rock"])
+Charmeleon= pokemon(100,"slash",70,"flamethrower",90,"firefang",65,"fire",["water","ground","rock"],"Leon")
 
 
 
-Charizard = pokemon( 140,"flame-thrower",100,"heat-wave",85,"thunder-punch",75,"fire",["rock","electric","water"])
+Charizard = pokemon( 140,"flame-thrower",100,"heat-wave",85,"thunder-punch",75,"fire",["rock","electric","water"],"Leon")
 
 
 
-Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,"water",["grass","electric",])
+Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,"water",["grass","electric"],"Garry")
 
 
 
@@ -91,5 +91,3 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
 
     else:
         print(opponent,"fainted")
-
-
