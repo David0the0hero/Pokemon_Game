@@ -1,3 +1,4 @@
+
 import random
 
 
@@ -41,16 +42,18 @@ Charizard = pokemon( 140,"flame-thrower",100,"heat-wave",85,"thunder-punch",75,"
 Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,"water",["grass","electric"],"Garry")
 
 
+print("Welcome to the world coranation series where trainers from all over the world battle to raise their rankings")
 
-pokedex={"Charizard":Charizard,"Pikachu":Pikachu,"Springatito":Springatito,"Glaceon":Glaceon,"Eevee":Eevee,"Charmander":Charmander,"Charmeleon":Charmeleon,"Blastoise":Blastoise,}
-what_pokemon = input("what pokemon would you like to use? ->")
+what_name = input("What is your name ->")
+
+
+pokedex={"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,}
+what_pokemon = input("what pokemon would you like to use? ->").lower()
 opponent = random.choice(list(pokedex.keys()))
-print("Your opponent is", opponent, "a" , pokedex[opponent].type, "type," , opponent, "has" ,pokedex[opponent].hp , "hp")
+print(pokedex[opponent].trainer , "set out a", opponent, "a" , pokedex[opponent].type, "type," , opponent, "has" ,pokedex[opponent].hp , "hp")
 print(what_pokemon)
 count = 1
-for i in pokedex[what_pokemon].attack:
-    print(f"{count}.) {i}:{pokedex[what_pokemon].attack[i]}")
-    count=count+1
+
 
 
 
@@ -58,7 +61,9 @@ for i in pokedex[what_pokemon].attack:
 while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
 
 
-
+    for i in pokedex[what_pokemon].attack:
+        print(f"{count}.) {i}:{pokedex[what_pokemon].attack[i]}")
+        count=count+1
 
     attack_choice = int(input("what attack would you like to use? (choose 1-3) ->"))
     my_att = (list(pokedex[what_pokemon].attack)[attack_choice-1])
@@ -90,4 +95,9 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
             print ("your pokemon has",pokedex[what_pokemon].hp,"hp")
 
     else:
-        print(opponent,"fainted")
+        print(opponent,"fainted wich means that the win goes to", what_name)
+
+    if  pokedex[what_pokemon].hp <=0:  
+        
+
+         print(what_pokemon,"fainted wich means that the win goes to", pokedex[opponent].trainer)
