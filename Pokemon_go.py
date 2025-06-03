@@ -19,6 +19,8 @@ Springatito = pokemon(90,"scratch", 10,"leafage",20,"trailblaze",50,"grass",["fi
 
 
 
+
+
 Glaceon = pokemon(110,"freeze-dry",70 ,"ice-fang",65,"quick-attack",40,"water",["fire","fighting","rock","steel"],"Rea")
 
 
@@ -42,20 +44,56 @@ Charizard = pokemon( 140,"flame-thrower",100,"heat-wave",85,"thunder-punch",75,"
 Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,"water",["grass","electric"],"Garry")
 
 
+
+Lucario = pokemon(130,"aura-sphere",80,"detect",0,"force palm",60,"fighting,steel",["fighting","fire","ground"],"Ash")
+
+
+
+Riolu = pokemon(80,"Vacuum-Wave",40,"force-palm",60,"detect",0,"fighting",["pyschic","fairy","flying"],"Ash")
+
+
+
+Umbreon = pokemon(120,"crunch",80,"dark-pulse",80,"swift",60,"dark",["fighting","fairy","bug"],"Piers")
+
+
+
+Flareon = pokemon(100,"flare-blitz",120,"temper flare",75,"ember",50,"fire",["ground","rock","water"],"kiwave")
+
+
+
+Heracross = pokemon(130,"Mega-horn",120,"brick-break",75,"Aerial-ace",60,"bug,fighting",["psychic","flying","fairy","fire"],"Goh")
+
+
+
+Pinsir = pokemon(130,"x-scissor",80,"bug-bite",60,"stone edge",100,"bug",["rock","fire","flying"],"Goh")
+
+
+
+
+
+
+
 print("Welcome to the world coranation series where trainers from all over the world battle to raise their rankings")
 
-what_name = input("What is your name ->")
+what_name = input("Welcome trainer what is your name ->")
+
+y=0
+pokedex={"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,"lucario":Lucario,"riolu":Riolu,"umbreon":Umbreon,"flareon":Flareon,"heracross":Heracross,"pinsir":Pinsir}
+while y == 0: 
+    what_pokemon = input("what pokemon would you like to use? Your options are listed bellow ->").lower()
+    
+    count = 1
+
+    try:
+         x=pokedex[what_pokemon]
+         y=1
+    except KeyError:
+         print(what_pokemon,"doesn't exist")
 
 
-pokedex={"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,}
-what_pokemon = input("what pokemon would you like to use? ->").lower()
 opponent = random.choice(list(pokedex.keys()))
 print(pokedex[opponent].trainer , "set out a", opponent, "a" , pokedex[opponent].type, "type," , opponent, "has" ,pokedex[opponent].hp , "hp")
-print(what_pokemon)
-count = 1
-
-
-
+print(what_pokemon,"has the moves")
 
 
 while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
@@ -66,6 +104,10 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
         count=count+1
 
     attack_choice = int(input("what attack would you like to use? (choose 1-3) ->"))
+    while attack_choice <1 or attack_choice>3:
+        print("that is no one of",what_pokemon+"'s attacks")
+        attack_choice = int(input("what attack would you like to use? (choose 1-3) ->"))
+
     my_att = (list(pokedex[what_pokemon].attack)[attack_choice-1])
     if pokedex[what_pokemon].type in pokedex[opponent].weakness:
         my_dam = (pokedex[what_pokemon].attack)[my_att] *1.5
@@ -74,7 +116,7 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
         my_dam = (pokedex[what_pokemon].attack)[my_att]
     print(what_pokemon,"used",my_att,"and dealt",pokedex[what_pokemon].attack[my_att],)
     pokedex[opponent].hp = pokedex[opponent].hp - my_dam
-    print ("your opponent has",pokedex[opponent].hp,"hp")
+    print ("your opponent has",pokedex[opponent].hp,"hop")
 
     if pokedex[what_pokemon].type in pokedex[what_pokemon].weakness:
         my_dam = (pokedex[what_pokemon].attack)[my_att] *1.5
