@@ -84,7 +84,7 @@ Arceus  = pokemon(140,"hyper-beam",150,"judgment",100,"future-sight",120,["norma
 
 
 
-#dialga = pokemon,140,"",,"",,"",,["fighting"],["ground"],"")
+Dialga = pokemon,140,"roars-of-time",150,"dragon-claw",80,"draco-meteor",120,["steel","dragon"],["fighting"],["ground"],"")
 
 
 
@@ -93,6 +93,7 @@ Squirtle = pokemon(90,"hydro-pump",110,"aqua-tail",90,"muddy-water",90,["water"]
 
 
 Gyrados = pokemon(130,"ice-fang",90,"hyper-beam",110,"aqua-tail",90,["water","flying"],["fighting","grass","bug"],"lance")
+
 
 
 
@@ -108,8 +109,8 @@ while y == 0:
         print(i,"a",pokedex[i].type,"type pokemon")
 
     what_pokemon = input("what pokemon would you like to use? Your options are listed above ->").lower()
-    if what_pokemon == Arceus:
-        x = Arceus
+    if what_pokemon == "Arceus" or what_pokemon=="Dialga":
+        x = Arceus,Dialga
     count = 1
 
     try:
