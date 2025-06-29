@@ -4,10 +4,10 @@ import random
 
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
-cursor.execute("CREATE TABLE users (username VARCHAR(255),password VARCHAR(255),pokemon VARCHAR(255), xp INT);")
+#cursor.execute("CREATE TABLE users (username VARCHAR(255),password VARCHAR(255),pokemon VARCHAR(255), xp INT);")
 
 signup=0
-ask_acc = input("Do you have an account? (y/n)->")
+ask_acc = input("Welcome pokemon trainer do you have an account? (y/n)->")
 while signup == 0:
     if ask_acc == "n":
         print("Hmm, looks like you don't have an account. Lets make you one. Follow the steps to make an account.")
@@ -15,10 +15,10 @@ while signup == 0:
     
         cursor.execute("SELECT username FROM users;")
         all_users = cursor.fetchall()
+        
         all_users1=[]
         for i in all_users:
             all_users1.append(i[0])
-        print(all_users)
         if username not in all_users1:
             password = input("Step.2 Create your password ->")
             new_user = ("INSERT INTO users VALUES (?,?,?,?);")
@@ -31,9 +31,21 @@ while signup == 0:
     else:
         print("Cool lets sign in to your account")
         username = input("What is your username ->")
+        cursor.execute("SELECT username FROM users;")
+        all_users = cursor.fetchall()
+        all_users1=[]
+        for i in all_users:
+            all_users1.append(i[0])
+        if username not in all_users1:
+            print("sorry that username doesn't exist")
         password = input("What is your password ->")
-
-
+        cursor.execute(f"SELECT password FROM users WHERE username ={username};")
+        all_pass = cursor.fetchall()
+        if password == all_pass[0][0]:
+            print("sign in sucsefull")
+            signup=1
+        else:
+            print("that password doesn't exist")
 
 
 class pokemon:
@@ -67,8 +79,10 @@ Wartortle = pokemon(100,"surf",90,"take-down",90,"water-pulse",65,["water"],["el
 
 Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,["water"],["grass","electric"],"Garry")
 
+
+#Todile = 
 # FIRE TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
-Fuecoco = pokemon(100,"incinerate",95,"tackle",70,"bite",50,["fire"],["water,ground,rock"],"kiwave")
+Fuecoco = pokemon(90,"incinerate",95,"tackle",70,"bite",50,["fire"],["water,ground,rock"],"kiwave")
 
 
 Charmander= pokemon(90,"fire-spin",40,"false-swipe",40,"ember",40,["fire"],["water","ground","rock"],"Leon")
@@ -94,6 +108,8 @@ Flareon = pokemon(100,"flare-blitz",120,"temper flare",75,"ember",50,["fire"],["
 # LEVEL 3 WILD POKEMON AND EVOLUTIONS
 Nicket = pokemon(80,"swift",50,"dark-pulse ",70,"bite",50,["dark"],["fighting,fairy,bug"],"piers")
 
+#LEVEL 10 WILD POKEMON AND EVOLUTIONS 
+Gyrados = pokemon(130,"ice-fang",90,"hyper-beam",110,"aqua-tail",90,["water","flying"],["fighting","grass","bug"],"lance")
 
 
 # LEVEL 40 WILD POKEMON AND EVOLUTIONS
@@ -109,7 +125,6 @@ Heracross = pokemon(130,"Mega-horn",120,"brick-break",75,"Aerial-ace",60,["bug",
 Pinsir = pokemon(130,"x-scissor",80,"bug-bite",60,"stone edge",100,["bug"],["rock","fire","flying"],"Goh")
 
 
-Gyrados = pokemon(130,"ice-fang",90,"hyper-beam",110,"aqua-tail",90,["water","flying"],["fighting","grass","bug"],"lance")
 
 
 
@@ -132,7 +147,7 @@ print("Welcome to the world coranation series where trainers from all over the w
 
 what_name = input("Welcome trainer what is your name ->")
 
-y = 1
+y = 0
 pokemon_levels = {1:[Charmander,Squirtle,Pikachu],3:[Springatito,Eevee],6:[]}
 pokedex = {"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,"lucario":Lucario,"riolu":Riolu,"umbreon":Umbreon,"flareon":Flareon,"heracross":Heracross,"pinsir":Pinsir,"squirtle":Squirtle,"gryados":Gyrados,"nicket":Nicket,"bulbasaur":Bulbasaur,"fuecoco":Fuecoco,"wartortle":Wartortle}
 while y == 0: 
@@ -209,3 +224,18 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
 
         print(what_pokemon,"fainted wich means that the win goes to", pokedex[opponent].trainer)
     count=1
+
+#           ?????????????
+#         /               \
+#        /                 \
+#       /                   \
+#      |  ( (>)       (>) )  | 
+#      |       `` / ``       |  
+#      |         /_          |
+#       \    ==========     /
+#        \_________________/
+#         |_________  _____|
+#                  / /\ 
+#                 / /   
+#                / /   
+#
