@@ -5,7 +5,9 @@ import random
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
 #cursor.execute("CREATE TABLE users (username VARCHAR(255),password VARCHAR(255),pokemon VARCHAR(255), xp INT);")
-
+cursor.execute("SELECT * FROM users;")
+David_favoriteword = cursor.fetchall()
+print(David_favoriteword)
 signup=0
 ask_acc = input("Welcome pokemon trainer do you have an account? (y/n)->")
 while signup == 0:
@@ -23,29 +25,40 @@ while signup == 0:
             password = input("Step.2 Create your password ->")
             new_user = ("INSERT INTO users VALUES (?,?,?,?);")
             print("your all done with the acount setup, now enjoy yourself and climb the trainer rankings to become the best pokemon trainer you can be")
-            cursor.execute(new_user, (username, password, "", 5))
+            cursor.execute(new_user, (username, password, "", 1))
             connection.commit()
             signup = 1
         else:
             print("Username already exists")
     else:
-        print("Cool lets sign in to your account")
-        username = input("What is your username ->")
+        print("Cool, let's sign in to your account")
+
+        username = input("What is your username -> ")
+
+# Get all usernames from the database
         cursor.execute("SELECT username FROM users;")
         all_users = cursor.fetchall()
-        all_users1=[]
-        for i in all_users:
-            all_users1.append(i[0])
-        if username not in all_users1:
-            print("sorry that username doesn't exist")
-        password = input("What is your password ->")
-        cursor.execute(f"SELECT password FROM users WHERE username ={username};")
-        all_pass = cursor.fetchall()
-        if password == all_pass[0][0]:
-            print("sign in sucsefull")
-            signup=1
+
+# Extract usernames from fetched rows
+        all_usernames = [i[0] for i in all_users]
+
+# Check if username exists
+        if username not in all_usernames:
+            print("Sorry, that username doesn't exist")
         else:
-            print("that password doesn't exist")
+            password = input("What is your password -> ")
+
+    # Parameterized query to safely fetch password for the username
+            cursor.execute("SELECT password FROM users WHERE username = ?;", (username,))
+            result = cursor.fetchone()
+
+            if result is None:
+                print("Unexpected error: user not found")
+            elif password == result[0]:
+                print("Sign in successful")
+                signup = 1
+            else:
+                print("That password doesn't exist")
 
 
 class pokemon:
@@ -70,6 +83,10 @@ Springatito = pokemon(90,"scratch", 10,"leafage",20,"trailblaze",50,["grass"],["
 
 Bulbasaur = pokemon(80,"leech-seed",50,"razor leaf",70,"bite",50,["grass,poison"],["flying,psychic,ice,fire"],"milo")
 
+
+Venusaur = pokemon(130,"seed-bomb",80,"take-down",90,"solar-beam",120,["grass"],["psychic","flying","fire","ice"],"Ash")
+
+
 # WATER TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
 Squirtle = pokemon(90,"hydro-pump",110,"aqua-tail",90,"muddy-water",90,["water"],["electric","grass"],"Garry")
 
@@ -78,6 +95,19 @@ Wartortle = pokemon(100,"surf",90,"take-down",90,"water-pulse",65,["water"],["el
 
 
 Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,["water"],["grass","electric"],"Garry")
+
+
+Froakie = pokemon(90,"water-pulse",50,"water-gun",40,"chilling-water",50,["water"],["grass","electric"],"Ash")
+
+
+Frogadier = pokemon(110,"water-pledge",85,"bite",60,"hydro-pump",110,["water"],["grass","electric"],"Ash")
+
+
+Greninja = pokemon(130,"water-shuriken",75,"scald",80,"surf",110,["water","dark"],["grass","electric"],"Ash")
+
+
+
+Totodile = pokemon(90,"aqua-jet",40,"chilling-water",50,"water-pulse",50,["water"],["electric","grass"],"Ash")
 
 
 #Todile = 
@@ -145,26 +175,27 @@ Palkia = pokemon(140,"hydro-pump",110,"hyper-beam",150,"draco-meteor",120,["wate
 
 print("Welcome to the world coranation series where trainers from all over the world battle to raise their rankings")
 
-what_name = input("Welcome trainer what is your name ->")
 
 y = 0
 pokemon_levels = {1:[Charmander,Squirtle,Pikachu],3:[Springatito,Eevee],6:[]}
-pokedex = {"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,"lucario":Lucario,"riolu":Riolu,"umbreon":Umbreon,"flareon":Flareon,"heracross":Heracross,"pinsir":Pinsir,"squirtle":Squirtle,"gryados":Gyrados,"nicket":Nicket,"bulbasaur":Bulbasaur,"fuecoco":Fuecoco,"wartortle":Wartortle}
+pokedex = {"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,"lucario":Lucario,"riolu":Riolu,"umbreon":Umbreon,"flareon":Flareon,"heracross":Heracross,"pinsir":Pinsir,"squirtle":Squirtle,"gryados":Gyrados,"nicket":Nicket,"bulbasaur":Bulbasaur,"fuecoco":Fuecoco,"wartortle":Wartortle,"totodile":Totodile,"froakie":Froakie,"frogadier":Frogadier,"greninja":Greninja,"venusaur":Venusaur}
+forbidden_pokedex = {'Arceus':Arceus, "Dialgo":Dialga, "Palkia":Palkia}
 while y == 0: 
     for i in pokedex:
-        print(i,"a",pokedex[i].type,"type pokemon")
+        print(i,"a",(pokedex[i].type)[0],"type pokemon")
 
     what_pokemon = input("what pokemon would you like to use? Your options are listed above ->").lower()
     if what_pokemon == "Arceus" or what_pokemon == "Dialga" or what_pokemon == "Palkia":
-        x = Arceus,Dialga,Palkia
+        x = what_pokemon
+        x=forbidden_pokedex[what_pokemon]
+    else:
+        try:
+            x=pokedex[what_pokemon]
+            y=1
+        except KeyError:
+             print(what_pokemon,"doesn't exist")
+
     count = 1
-
-    try:
-         x=pokedex[what_pokemon]
-         y=1
-    except KeyError:
-         print(what_pokemon,"doesn't exist")
-
 
 opponent = random.choice(list(pokedex.keys()))
 print(pokedex[opponent].trainer , "set out a", opponent, "a" , pokedex[opponent].type, "type," , opponent, "has" ,pokedex[opponent].hp , "hp")
@@ -216,7 +247,7 @@ while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
                 print ("your pokemon has",pokedex[what_pokemon].hp,"hp")
 
         else:
-            print(opponent,"fainted wich means that the win goes to", what_name)
+            print(opponent,"fainted wich means that the win goes to", username)
     else:
         print(what_pokemon,"used detect.",opponent,"did 0 damage")
     if  pokedex[what_pokemon].hp <=0:  
