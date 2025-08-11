@@ -1,272 +1,321 @@
 import sqlite3
 import random
 
-
+# --- Setup SQLite Connection ---
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
-#cursor.execute("CREATE TABLE users (username VARCHAR(255),password VARCHAR(255),pokemon VARCHAR(255), xp INT);")
-cursor.execute("SELECT * FROM users;")
-David_favoriteword = cursor.fetchall()
-print(David_favoriteword)
-signup=0
-ask_acc = input("Welcome pokemon trainer do you have an account? (y/n)->")
-while signup == 0:
+
+# Create table if not exists (updated to store pokemon_name and level)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    username TEXT PRIMARY KEY,
+    password TEXT,
+    pokemon_name TEXT,
+    pokemon_level INTEGER,
+    xp INTEGER
+);
+""")
+connection.commit()
+
+# --- Account Management ---
+signup = False
+ask_acc = input("Welcome Pokémon Trainer! Do you have an account? (y/n) -> ").lower()
+
+while not signup:
     if ask_acc == "n":
-        print("Hmm, looks like you don't have an account. Lets make you one. Follow the steps to make an account.")
-        username = input("Step.1 Enter username->")
-    
-        cursor.execute("SELECT username FROM users;")
-        all_users = cursor.fetchall()
-        
-        all_users1=[]
-        for i in all_users:
-            all_users1.append(i[0])
-        if username not in all_users1:
-            password = input("Step.2 Create your password ->")
-            new_user = ("INSERT INTO users VALUES (?,?,?,?);")
-            print("your all done with the acount setup, now enjoy yourself and climb the trainer rankings to become the best pokemon trainer you can be")
-            cursor.execute(new_user, (username, password, "", 1))
+        print("Let's create your account.")
+        username = input("Username -> ")
+        cursor.execute("SELECT username FROM users WHERE username = ?;", (username,))
+        if cursor.fetchone() is None:
+            password = input("Create a password -> ")
+            # New user starts with a default Pokemon Pikachu at level 1, xp 0
+            cursor.execute("INSERT INTO users VALUES (?, ?, ?, ?, ?);",
+                           (username, password, "pikachu", 1, 1))  # Set level to 1 and xp to 0
             connection.commit()
-            signup = 1
+            print("Account created! Time to begin your journey.")
+            signup = True
         else:
-            print("Username already exists")
+            print("Username already exists.")
     else:
-        print("Cool, let's sign in to your account")
-
-        username = input("What is your username -> ")
-
-# Get all usernames from the database
-        cursor.execute("SELECT username FROM users;")
-        all_users = cursor.fetchall()
-
-# Extract usernames from fetched rows
-        all_usernames = [i[0] for i in all_users]
-
-# Check if username exists
-        if username not in all_usernames:
-            print("Sorry, that username doesn't exist")
-        else:
-            password = input("What is your password -> ")
-
-    # Parameterized query to safely fetch password for the username
-            cursor.execute("SELECT password FROM users WHERE username = ?;", (username,))
-            result = cursor.fetchone()
-
-            if result is None:
-                print("Unexpected error: user not found")
-            elif password == result[0]:
-                print("Sign in successful")
-                signup = 1
+        username = input("Enter username -> ")
+        cursor.execute("SELECT password FROM users WHERE username = ?;", (username,))
+        record = cursor.fetchone()
+        if record:
+            password = input("Password -> ")
+            if password == record[0]:
+                print("Login successful.")
+                signup = True
             else:
-                print("That password doesn't exist")
+                print("Wrong password.")
+        else:
+            print("Username not found.")
 
-
-class pokemon:
-    def __init__(self,hp,a1_name,a1_dam,a2_name,a2_dam,a3_name,a3_dam,type,weakness,trainer=None):
-        self.hp = hp
-        self.attack = {a1_name:a1_dam,a2_name:a2_dam,a3_name:a3_dam}
-        self.type = type
+# --- Pokémon Class ---
+class Pokemon:
+    def __init__(self, name, base_hp, attacks, types, weakness, trainer=None,
+                 level=1, evolution=None):
+        self.name = name
+        self.level = level
+        self.base_hp = base_hp
+        self.max_hp = base_hp + (level * 5)
+        self.hp = self.max_hp
+        self.attacks = attacks
+        self.types = types
         self.weakness = weakness
         self.trainer = trainer
-       
-
-# STARTER TYPE POKEMON
-
-
-# ELECTRIC TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
-Pikachu = pokemon(90,"quick attack",40,"iron tail",100,"thunderbolt",100,["electric"],["ground"],"Ash")
-
-
-# LEAF TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
-Springatito = pokemon(90,"scratch", 10,"leafage",20,"trailblaze",50,["grass"],["fire","ice","flying","poison","bug"],"Goh")
-
-
-Bulbasaur = pokemon(80,"leech-seed",50,"razor leaf",70,"bite",50,["grass,poison"],["flying,psychic,ice,fire"],"milo")
-
-
-Venusaur = pokemon(130,"seed-bomb",80,"take-down",90,"solar-beam",120,["grass"],["psychic","flying","fire","ice"],"Ash")
-
-
-# WATER TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
-Squirtle = pokemon(90,"hydro-pump",110,"aqua-tail",90,"muddy-water",90,["water"],["electric","grass"],"Garry")
-
-
-Wartortle = pokemon(100,"surf",90,"take-down",90,"water-pulse",65,["water"],["elecrtic","grass"],"Garry")
-
-
-Blastoise = pokemon(120,"hydro-crash",120,"water-pump",110,"shell-crack",70,["water"],["grass","electric"],"Garry")
-
-
-Froakie = pokemon(90,"water-pulse",50,"water-gun",40,"chilling-water",50,["water"],["grass","electric"],"Ash")
-
-
-Frogadier = pokemon(110,"water-pledge",85,"bite",60,"hydro-pump",110,["water"],["grass","electric"],"Ash")
-
-
-Greninja = pokemon(130,"water-shuriken",75,"scald",80,"surf",110,["water","dark"],["grass","electric"],"Ash")
-
-
-
-Totodile = pokemon(90,"aqua-jet",40,"chilling-water",50,"water-pulse",50,["water"],["electric","grass"],"Ash")
-
-
-#Todile = 
-# FIRE TYPE STARTER POKEMON AND EVOLUTIONS IN ORDER
-Fuecoco = pokemon(90,"incinerate",95,"tackle",70,"bite",50,["fire"],["water,ground,rock"],"kiwave")
-
-
-Charmander= pokemon(90,"fire-spin",40,"false-swipe",40,"ember",40,["fire"],["water","ground","rock"],"Leon")
-
-
-Charmeleon= pokemon(100,"slash",90,"flamethrower",90,"firefang",65,["fire"],["water","ground","rock"],"Leon")
-
-
-Charizard = pokemon( 140,"flame-thrower",100,"heat-wave",85,"thunder-punch",75,["fire","flying"],["rock","electric","water"],"Leon")
-
-# NORMAL TYPE STARTER POKEMON AND EVOLUTIONS 
-Eevee = pokemon(90,"tackle",60,"covet",40,"bite",60,["normal"],["fighting"],"Chloe")
-
-
-Glaceon = pokemon(110,"freeze-dry",70 ,"ice-fang",65,"quick-attack",40,["water"],["fire","fighting","rock","steel"],"Rea")
-
-
-Umbreon = pokemon(120,"crunch",80,"dark-pulse",80,"swift",60,["dark"],["fighting","fairy","bug"],"Piers")
-
-
-Flareon = pokemon(100,"flare-blitz",120,"temper flare",75,"ember",50,["fire"],["ground","rock","water"],"kiwave")
-
-# LEVEL 3 WILD POKEMON AND EVOLUTIONS
-Nicket = pokemon(80,"swift",50,"dark-pulse ",70,"bite",50,["dark"],["fighting,fairy,bug"],"piers")
-
-#LEVEL 10 WILD POKEMON AND EVOLUTIONS 
-Gyrados = pokemon(130,"ice-fang",90,"hyper-beam",110,"aqua-tail",90,["water","flying"],["fighting","grass","bug"],"lance")
-
-
-# LEVEL 40 WILD POKEMON AND EVOLUTIONS
-Riolu = pokemon(80,"Vacuum-Wave",40,"force-palm",60,"detect",0,["fighting"],["pyschic","fairy","flying"],"Ash")
-
-
-Lucario = pokemon(130,"aura-sphere",80,"detect",0,"force palm",60,["fighting","steel"],["fighting","fire","ground"],"Ash")
-
-
-Heracross = pokemon(130,"Mega-horn",120,"brick-break",75,"Aerial-ace",60,["bug","fighting"],["psychic","flying","fairy","fire"],"Goh")
-
-
-Pinsir = pokemon(130,"x-scissor",80,"bug-bite",60,"stone edge",100,["bug"],["rock","fire","flying"],"Goh")
-
-
-
-
-
-
-
-
-
-
-# FORBIDDEN POKEMON
-Arceus  = pokemon(140,"hyper-beam",150,"judgment",100,"future-sight",120,["normal"],["fighting"],"better then the best, I am the best of the best")
-
-
-Dialga = pokemon(140,"roars-of-time",150,"dragon-claw",80,"draco-meteor",120,["steel","dragon"],["fighting","ground"],"")
-
-
-Palkia = pokemon(140,"hydro-pump",110,"hyper-beam",150,"draco-meteor",120,["water","dragon"],["dragon","fairy"])
-
-
-print("Welcome to the world coranation series where trainers from all over the world battle to raise their rankings")
-
-
-y = 0
-pokemon_levels = {1:[Charmander,Squirtle,Pikachu],3:[Springatito,Eevee],6:[]}
-pokedex = {"charizard":Charizard,"pikachu":Pikachu,"springatito":Springatito,"glaceon":Glaceon,"eevee":Eevee,"charmander":Charmander,"charmeleon":Charmeleon,"blastoise":Blastoise,"lucario":Lucario,"riolu":Riolu,"umbreon":Umbreon,"flareon":Flareon,"heracross":Heracross,"pinsir":Pinsir,"squirtle":Squirtle,"gryados":Gyrados,"nicket":Nicket,"bulbasaur":Bulbasaur,"fuecoco":Fuecoco,"wartortle":Wartortle,"totodile":Totodile,"froakie":Froakie,"frogadier":Frogadier,"greninja":Greninja,"venusaur":Venusaur}
-forbidden_pokedex = {'Arceus':Arceus, "Dialgo":Dialga, "Palkia":Palkia}
-while y == 0: 
-    for i in pokedex:
-        print(i,"a",(pokedex[i].type)[0],"type pokemon")
-
-    what_pokemon = input("what pokemon would you like to use? Your options are listed above ->").lower()
-    if what_pokemon == "Arceus" or what_pokemon == "Dialga" or what_pokemon == "Palkia":
-        x = what_pokemon
-        x=forbidden_pokedex[what_pokemon]
-    else:
+        self.evolution = evolution
+
+    def level_up(self):
+        self.level += 1
+        self.max_hp += 5
+        self.hp = self.max_hp
+        if self.evolution and self.level >= self.evolution[1]:
+            self.evolve()
+
+    def evolve(self):
+        next_evo_name = self.evolution[0]
+        print(f"\n🎉 Your {self.name} is evolving into {next_evo_name.title()}!")
+        evo_pokemon = pokedex[next_evo_name]
+        self.name = evo_pokemon.name
+        self.base_hp = evo_pokemon.base_hp
+        self.max_hp = self.base_hp + (self.level * 5)
+        self.hp = self.max_hp
+        self.attacks = evo_pokemon.attacks
+        self.types = evo_pokemon.types
+        self.weakness = evo_pokemon.weakness
+        self.trainer = evo_pokemon.trainer
+        self.evolution = evo_pokemon.evolution
+        print(f"Your Pokémon evolved to {self.name}!")
+
+# --- Pokémon Data: full list with base stats, moves, and evolutions ---
+pokedex = {
+    "pikachu": Pokemon(
+        "Pikachu", 90,
+        {"quick attack": 40, "iron tail": 100, "thunderbolt": 100},
+        ["electric"], ["ground"], "Ash",
+        evolution=("raichu", 16)
+    ),
+    "raichu": Pokemon(
+        "Raichu", 120,
+        {"quick attack": 50, "iron tail": 100, "thunderbolt": 120},
+        ["electric"], ["ground"], "Ash",
+        evolution=None
+    ),
+    "charmander": Pokemon(
+        "Charmander", 90,
+        {"ember": 40, "scratch": 40, "flamethrower": 90},
+        ["fire"], ["water", "rock"], "Leon",
+        evolution=("charmeleon", 16)
+    ),
+    "charmeleon": Pokemon(
+        "Charmeleon", 110,
+        {"ember": 50, "scratch": 50, "flamethrower": 100},
+        ["fire"], ["water", "rock"], "Leon",
+        evolution=("charizard", 36)
+    ),
+    "charizard": Pokemon(
+        "Charizard", 150,
+        {"flamethrower": 120, "wing attack": 80, "fire blast": 140},
+        ["fire", "flying"], ["water", "rock", "electric"], "Leon",
+        evolution=None
+    ),
+    "squirtle": Pokemon(
+        "Squirtle", 90,
+        {"water gun": 40, "aqua tail": 90, "hydro pump": 110},
+        ["water"], ["grass", "electric"], "Garry",
+        evolution=("wartortle", 16)
+    ),
+    "wartortle": Pokemon(
+        "Wartortle", 110,
+        {"water gun": 50, "aqua tail": 100, "hydro pump": 120},
+        ["water"], ["grass", "electric"], "Garry",
+        evolution=("blastoise", 36)
+    ),
+    "blastoise": Pokemon(
+        "Blastoise", 150,
+        {"hydro pump": 140, "aqua tail": 110, "shell smash": 0},
+        ["water"], ["grass", "electric"], "Garry",
+        evolution=None
+    ),
+    "eevee": Pokemon(
+        "Eevee", 90,
+        {"tackle": 60, "bite": 60, "covet": 40},
+        ["normal"], ["fighting"], "Chloe",
+        evolution=("vaporeon", 20)
+    ),
+    "vaporeon": Pokemon(
+        "Vaporeon", 130,
+        {"water gun": 60, "hydro pump": 130, "aqua ring": 0},
+        ["water"], ["grass", "electric"], "Chloe",
+        evolution=None
+    ),
+    "jolteon": Pokemon(
+        "Jolteon", 110,
+        {"thunderbolt": 100, "volt switch": 80, "shadow ball": 90},
+        ["electric"], ["ground"], "Chloe",
+        evolution=None
+    ),
+    "flareon": Pokemon(
+        "Flareon", 130,
+        {"fire blast": 120, "flamethrower": 100, "quick attack": 40},
+        ["fire"], ["water", "rock"], "Chloe",
+        evolution=None
+    ),
+    "espeon": Pokemon(
+        "Espeon", 110,
+        {"psychic": 90, "shadow ball": 80, "dazzling gleam": 80},
+        ["psychic"], ["dark", "ghost"], "Chloe",
+        evolution=None
+    ),
+    "umbreon": Pokemon(
+        "Umbreon", 130,
+        {"foul play": 80, "moonlight": 0, "toxic": 0},
+        ["dark"], ["fighting", "bug"], "Chloe",
+        evolution=None
+    ),
+    "leafeon": Pokemon(
+        "Leafeon", 130,
+        {"leaf blade": 90, "solar beam": 150, "synthesis": 0},
+        ["grass"], ["fire", "ice", "poison"], "Chloe",
+        evolution=None
+    ),
+    "glaceon": Pokemon(
+        "Glaceon", 130,
+        {"ice beam": 90, "blizzard": 120, "snow cloak": 0},
+        ["ice"], ["fire", "steel", "rock"], "Chloe",
+        evolution=None
+    ),
+    "sylveon": Pokemon(
+        "Sylveon", 130,
+        {"moonblast": 95, "hyper voice": 90, "calm mind": 0},
+        ["fairy"], ["steel", "poison"], "Chloe",
+        evolution=None
+    ),
+    "bulbasaur": Pokemon(
+        "Bulbasaur", 90,
+        {"vine-whip": 70, "poison-powder": 25, "seed-bomb": 90},
+        ["grass"], ["fire" ,"ice"]
+    )
+}
+
+# --- Level-based unlocks ---
+level_unlocks = {
+    1: ["bulbasaur", "charmander","squirtle"],
+    3: ["pikachu","eevee"],
+    5: ["leafeon","sylveon","glaceon","umbreon","espeon","flareon","jolteon","vaporeon"]
+}
+
+# --- Load Player Data (XP, Pokemon Name, Pokemon Level) ---
+cursor.execute("SELECT xp, pokemon_name, pokemon_level FROM users WHERE username = ?;", (username,))
+xp, poke_name, poke_level = cursor.fetchone()
+
+# Force lowercase on poke_name to avoid mismatch
+poke_name = poke_name.lower()
+if poke_name not in pokedex:
+    print(f"Error: Pokémon '{poke_name}' not found in pokedex. Defaulting to Pikachu.")
+    poke_name = "pikachu"
+
+base_pokemon = pokedex[poke_name]
+player_pokemon = Pokemon(
+    base_pokemon.name,
+    base_pokemon.base_hp,
+    base_pokemon.attacks,
+    base_pokemon.types,
+    base_pokemon.weakness,
+    base_pokemon.trainer,
+    level=poke_level,
+    evolution=base_pokemon.evolution
+)
+player_pokemon.max_hp = player_pokemon.base_hp + (poke_level * 5)
+player_pokemon.hp = player_pokemon.max_hp
+quit_game = 'y'
+while quit_game=='y':
+    # --- Unlock Pokémon Based on XP ---
+    available_pokemon = []
+    for lvl_req, names in level_unlocks.items():
+        if xp >= lvl_req:
+            available_pokemon.extend(names)
+
+    print("\n🎮 Welcome to the Pokémon League!\nAvailable Pokémon based on your XP:")
+    for name in available_pokemon:
+        print(f"- {name.title()}")
+
+    # --- Choose Pokémon ---
+
+    while True:
+        choice = input("Which Pokémon would you like to use? -> ").lower()
+        if choice in available_pokemon:
+            base_poke = pokedex[choice]
+            player_pokemon = Pokemon(
+                base_poke.name,
+                base_poke.base_hp,
+                base_poke.attacks,
+                base_poke.types,
+                base_poke.weakness,
+                base_poke.trainer,
+                level=1,  # Start selected Pokémon at level 1
+                evolution=base_poke.evolution
+            )
+            break
+        print("Invalid choice or Pokémon not unlocked yet.")
+
+    # --- Battle Setup ---
+    opponent_name = random.choice(list(pokedex.keys()))
+    opponent_pokemon = pokedex[opponent_name]
+    print(f"\n⚔️ Battle Begins! {opponent_pokemon.trainer} sent out {opponent_name.title()}!")
+    print(f"{opponent_name.title()} (Type: {opponent_pokemon.types}) has {opponent_pokemon.hp} HP.\n")
+
+    # --- Battle Loop ---
+    while player_pokemon.hp > 0 and opponent_pokemon.hp > 0:
+        print("\nYour moves:")
+        for idx, move in enumerate(player_pokemon.attacks):
+            print(f"{idx+1}. {move.title()} ({player_pokemon.attacks[move]} dmg)")
+
+        # Player Attack
         try:
-            x=pokedex[what_pokemon]
-            y=1
-        except KeyError:
-             print(what_pokemon,"doesn't exist")
+            move_index = int(input("Choose your move (1-3) -> ")) - 1
+            move_name = list(player_pokemon.attacks.keys())[move_index]
+        except (ValueError, IndexError):
+            print("Invalid choice.")
+            continue
 
-    count = 1
+        move_dmg = player_pokemon.attacks[move_name]
+        if any(t in opponent_pokemon.weakness for t in player_pokemon.types):
+            move_dmg *= 1.2
 
-opponent = random.choice(list(pokedex.keys()))
-print(pokedex[opponent].trainer , "set out a", opponent, "a" , pokedex[opponent].type, "type," , opponent, "has" ,pokedex[opponent].hp , "hp")
-print(what_pokemon,"has the moves")
+        print(f"\n{player_pokemon.name} used {move_name.title()} and dealt {int(move_dmg)} damage!")
+        opponent_pokemon.hp -= move_dmg
+        opponent_pokemon.hp = max(opponent_pokemon.hp, 0)
+        print(f"{opponent_pokemon.name} now has {int(opponent_pokemon.hp)} HP.")
 
+        if opponent_pokemon.hp <= 0:
+            print(f"\n✅ You defeated {opponent_pokemon.name}!")
+            xp_gain = 2
+            xp += xp_gain
+            print(f"You gained {xp_gain} XP! Total XP: {xp}")
+            temp_list = []
+            # Level up player Pokémon for XP gain
+            while xp >= player_pokemon.level * 5:
+                player_pokemon.level_up()
+                temp_list.append(f"{player_pokemon.name} leveled up to level {player_pokemon.level}!")
+            print(temp_list[-1])
+            # Update XP and Pokémon info in DB
+            cursor.execute(
+                "UPDATE users SET xp = ?, pokemon_name = ?, pokemon_level = ? WHERE username = ?;",
+                (xp, player_pokemon.name.lower(), player_pokemon.level, username)
+            )
+            connection.commit()
+            break
 
-while pokedex[opponent].hp>0 and pokedex[what_pokemon].hp>0:
+        # Opponent Attack
+        opp_move = random.choice(list(opponent_pokemon.attacks.keys()))
+        opp_dmg = opponent_pokemon.attacks[opp_move]
+        print(f"\n{opponent_pokemon.name} used {opp_move.title()} and dealt {opp_dmg} damage!")
+        player_pokemon.hp -= opp_dmg
+        player_pokemon.hp = max(player_pokemon.hp, 0)
+        print(f"{player_pokemon.name} has {int(player_pokemon.hp)} HP remaining.")
 
-
-    for i in pokedex[what_pokemon].attack:
-        print(f"{count}.) {i}:{pokedex[what_pokemon].attack[i]}")
-        count=count+1
-
-    attack_choice = int(input("what attack would you like to use? (choose 1-3) ->"))
-    while attack_choice <1 or attack_choice>3:
-        print("that is no one of",what_pokemon+"'s attacks")
-        attack_choice = int(input("what attack would you like to use? (choose 1-3) ->"))
-
-    my_att = (list(pokedex[what_pokemon].attack)[attack_choice-1])
-    if pokedex[what_pokemon].type in pokedex[opponent].weakness:
-        my_dam = (pokedex[what_pokemon].attack)[my_att] *1.2
-        
-    else:
-        my_dam = (pokedex[what_pokemon].attack)[my_att]
-    if my_att != "detect":
-        print(what_pokemon,"used",my_att,"and dealt",pokedex[what_pokemon].attack[my_att],)
-    else:
-        print(what_pokemon,"used detect")
-        print(what_pokemon,"is now protected")
-    pokedex[opponent].hp = pokedex[opponent].hp - my_dam
-    print ("your opponent has",pokedex[opponent].hp,"hp")
-
-    if pokedex[what_pokemon].type in pokedex[what_pokemon].weakness:
-        my_dam = (pokedex[what_pokemon].attack)[my_att] *1.2
-    else:
-         my_dam = (pokedex[what_pokemon].attack)[my_att]
-
-
-    if my_att != "detect":
-        if  pokedex[opponent].hp >0:
-                attack_choice = random.randrange(1,3)
-                opp_att = (list(pokedex[opponent].attack)[attack_choice-1])
-                opp_dam = (pokedex[opponent].attack)[opp_att]
-                print(opponent,"used",opp_att,"and dealt",opp_dam,"damage" )
-
-
-         
-                pokedex[what_pokemon].hp = pokedex[what_pokemon].hp - opp_dam
-                print ("your pokemon has",pokedex[what_pokemon].hp,"hp")
-
-        else:
-            print(opponent,"fainted wich means that the win goes to", username)
-    else:
-        print(what_pokemon,"used detect.",opponent,"did 0 damage")
-    if  pokedex[what_pokemon].hp <=0:  
-            
-
-        print(what_pokemon,"fainted wich means that the win goes to", pokedex[opponent].trainer)
-    count=1
-
-#           ?????????????
-#         /               \
-#        /                 \
-#       /                   \
-#      |  ( (>)       (>) )  | 
-#      |       `` / ``       |  
-#      |         /_          |
-#       \    ==========     /
-#        \_________________/
-#         |_________  _____|
-#                  / /\ 
-#                 / /   
-#                / /   
-#
+        if player_pokemon.hp <= 0:
+            print(f"\n❌ {player_pokemon.name} fainted! You lost the battle.")
+            break
+    quit_game = input("Do you want to battle again? (y/n): ")
