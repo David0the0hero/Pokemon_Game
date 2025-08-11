@@ -1,6 +1,7 @@
 import sqlite3
 import random
 
+
 # --- Setup SQLite Connection ---
 connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
